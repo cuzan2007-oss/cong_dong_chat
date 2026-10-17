@@ -3,145 +3,419 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cộng Đồng Chat</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#0b1120;color:#eef2ff;font-family:Arial,sans-serif}
-header{padding:20px;background:#111c31;text-align:center}
-header h2{color:#60a5fa;margin:0 0 8px}
-main{max-width:850px;margin:20px auto;padding:12px}
-.panel{background:#111c31;border:1px solid #293851;border-radius:14px;padding:15px;margin-bottom:15px}
-input,textarea,button{font:inherit;border-radius:9px;padding:12px}
-input,textarea{background:#0b1120;color:white;border:1px solid #34445f}
-button{background:#3b82f6;color:white;border:0;cursor:pointer}
-button:hover{filter:brightness(1.15)}
-#messages{height:50vh;min-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
-.msg{background:#1b2940;padding:12px;border-radius:12px;max-width:90%;overflow-wrap:anywhere}
-.mine{align-self:flex-end;background:#174a7c}
-.name{color:#93c5fd;font-weight:bold;font-size:13px;margin-bottom:6px}
-.time{color:#9caec5;font-size:11px;margin-top:7px}
-.msg img,.msg video{max-width:100%;max-height:300px;display:block;margin-top:8px;border-radius:8px}
-.row{display:flex;gap:8px;margin:10px 0}
-.row input{flex:1;min-width:0;width:50%}
-#message{width:100%;min-height:60px;resize:vertical}
-#status{color:#a5b4fc;font-size:13px}
-#preview{max-width:180px;max-height:130px;display:none;margin:10px 0}
-@media(max-width:500px){main{margin:5px auto}.row{flex-wrap:wrap}}
+:root {
+  --bg:#0b1020; --panel:#121a2b; --panel2:#19243a;
+  --text:#f1f5f9; --muted:#9baac0; --accent:#6c63ff;
+  --border:#29364d;
+}
+* {box-sizing:border-box}
+body {
+  margin:0; font-family:Arial,sans-serif; color:var(--text);
+  background:radial-gradient(ellipse at top,#1b2850 0%,var(--bg) 55%);
+  min-height:100vh;
+}
+button,input,textarea {font:inherit}
+button {cursor:pointer}
+.app {max-width:1100px;margin:auto;padding:20px}
+header {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:20px;flex-wrap:wrap;
+}
+.brand {display:flex;align-items:center;gap:12px}
+.logo {
+  width:48px;height:48px;border-radius:15px;
+  display:grid;place-items:center;font-size:25px;
+  background:linear-gradient(135deg,#8b5cf6,#3b82f6);
+}
+h1 {font-size:23px;margin:0 0 5px}
+.subtitle {font-size:13px;color:var(--muted)}
+.profile {
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:10px 13px;color:var(--text);
+}
+.layout {display:grid;grid-template-columns:250px 1fr;gap:18px}
+.sidebar,.chat {
+  background:rgba(18,26,43,.96);border:1px solid var(--border);
+  border-radius:18px;overflow:hidden;
+}
+.sidebar {padding:18px}
+.section-title {
+  color:var(--muted);font-size:12px;font-weight:bold;
+  letter-spacing:1px;margin:5px 0 14px;
+}
+.room {
+  padding:13px;background:#24284b;border:1px solid #4946a4;
+  border-radius:12px;margin-bottom:18px;
+}
+.room strong {display:block;margin-bottom:5px}
+.room small {color:#c0c7ff}
+.info {
+  color:var(--muted);font-size:13px;line-height:1.7;
+  margin-top:20px;
+}
+.chat {display:flex;flex-direction:column;min-height:650px}
+.chat-head {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:18px;border-bottom:1px solid var(--border);
+}
+.chat-head strong {font-size:16px}
+.status {font-size:12px;color:#a5b4fc;margin-top:5px}
+.clear {
+  color:#cbd5e1;background:transparent;border:1px solid var(--border);
+  padding:9px 12px;border-radius:9px;
+}
+.messages {
+  flex:1;min-height:400px;max-height:60vh;overflow-y:auto;
+  padding:20px;display:flex;flex-direction:column;gap:16px;
+}
+.welcome {
+  text-align:center;color:var(--muted);font-size:13px;
+  line-height:1.7;padding:20px 10px;
+  border:1px dashed var(--border);border-radius:14px;
+}
+.message {display:flex;gap:10px;align-items:flex-start}
+.avatar {
+  flex-shrink:0;width:36px;height:36px;border-radius:12px;
+  background:linear-gradient(135deg,#6c63ff,#06b6d4);
+  display:grid;place-items:center;font-weight:bold;
+}
+.bubble-wrap {min-width:0;max-width:85%}
+.meta {display:flex;gap:9px;align-items:center;margin:2px 0 7px}
+.name {font-size:13px;font-weight:bold}
+.time {font-size:11px;color:var(--muted)}
+.bubble {
+  background:var(--panel2);padding:11px 13px;border-radius:4px 14px 14px;
+  line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap;
+}
+.bubble img,.bubble video {
+  display:block;max-width:100%;max-height:320px;
+  border-radius:10px;margin-top:8px;
+}
+.message.mine {flex-direction:row-reverse}
+.message.mine .meta {justify-content:flex-end}
+.message.mine .bubble {
+  background:#4841ad;border-radius:14px 4px 14px 14px;
+}
+.message.mine .bubble-wrap {text-align:left}
+.composer {border-top:1px solid var(--border);padding:15px}
+.tools {display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.tool {
+  background:#202b40;border:1px solid var(--border);color:var(--text);
+  border-radius:9px;padding:8px 11px;
+}
+.tool:hover,.clear:hover {background:#303b53}
+#fileInput {display:none}
+.file-label {display:inline-block}
+#fileName {font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.compose-row {display:flex;align-items:flex-end;gap:10px}
+#messageInput {
+  flex:1;min-width:0;resize:vertical;min-height:48px;max-height:150px;
+  padding:14px;background:#0d1424;border:1px solid var(--border);
+  border-radius:12px;color:var(--text);outline:none;
+}
+#messageInput:focus {border-color:var(--accent)}
+.send {
+  min-height:48px;padding:0 20px;border:0;border-radius:12px;
+  color:white;font-weight:bold;background:linear-gradient(135deg,#7c6cff,#4f46e5);
+}
+.send:hover {filter:brightness(1.12)}
+.footer {text-align:center;color:var(--muted);font-size:12px;padding:15px}
+@media(max-width:700px) {
+  .app {padding:12px}
+  .layout {grid-template-columns:1fr}
+  .sidebar {padding:13px}
+  .sidebar .info {display:none}
+  .room {margin:10px 0 0}
+  .sidebar .section-title {margin:3px 0}
+  .chat {min-height:65vh}
+  .messages {max-height:50vh;padding:13px}
+  .bubble-wrap {max-width:88%}
+  h1 {font-size:19px}
+  .profile {max-width:100%;font-size:12px}
+  .send {padding:0 14px}
+}
 </style>
 </head>
 <body>
-<header>
-<h2>🌐 CỘNG ĐỒNG CHAT</h2>
-<div>Nơi kết nối và chia sẻ cùng mọi người</div>
-</header>
-<main>
-<section class="panel">
-<h3>👤 Tài khoản của bạn</h3>
-<div class="row">
-<input id="nickname" maxlength="30" placeholder="Nhập tên của bạn">
-<button id="save">Lưu tên</button>
-</div>
-<div id="status">Chế độ xem thử trên máy tính</div>
-</section>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">💬</div>
+      <div>
+        <h1>Cộng Đồng Chat</h1>
+        <div class="subtitle">Nơi mọi người kết nối và trò chuyện</div>
+      </div>
+    </div>
+    <button class="profile" id="changeName">👤 Đổi biệt danh</button>
+  </header>
 
-<section class="panel">
-<h3>💬 Phòng chat chung</h3>
-<div id="messages" aria-live="polite"></div>
-<textarea id="message" maxlength="3000" placeholder="Bạn muốn chia sẻ điều gì?"></textarea>
-<div class="row">
-<button id="send">Gửi tin nhắn ➤</button>
-<label style="background:#263650;padding:12px;border-radius:9px;cursor:pointer">
-📷 Chọn ảnh/video
-<input id="file" type="file" accept="image/*,video/*" hidden>
-</label>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="section-title">KHÔNG GIAN CỦA BẠN</div>
+      <div class="room">
+        <strong>🌐 Phòng trò chuyện chung</strong>
+        <small>Phòng chat trên thiết bị này</small>
+      </div>
+      <div class="info">
+        <b>📌 Hướng dẫn</b><br>
+        • Nhập nội dung rồi nhấn Gửi.<br>
+        • Chọn ảnh hoặc video để đính kèm.<br>
+        • Nhấn Enter để gửi tin nhắn.<br>
+        • Nhấn Shift + Enter để xuống dòng.<br><br>
+        <b>💾 Lưu tin nhắn</b><br>
+        Lịch sử được lưu trên trình duyệt hiện tại.
+        Xóa dữ liệu trình duyệt có thể làm mất lịch sử.
+      </div>
+    </aside>
+
+    <main class="chat">
+      <div class="chat-head">
+        <div>
+          <strong>💬 Phòng trò chuyện chung</strong>
+          <div class="status">● Đang hoạt động trên thiết bị này</div>
+        </div>
+        <button class="clear" id="clearBtn">Xóa lịch sử</button>
+      </div>
+
+      <div class="messages" id="messages">
+        <div class="welcome">
+          <div style="font-size:32px">👋</div>
+          <b>Chào mừng đến với Cộng Đồng Chat!</b><br>
+          Hãy gửi tin nhắn đầu tiên để bắt đầu.
+        </div>
+      </div>
+
+      <div class="composer">
+        <div class="tools">
+          <label class="tool file-label" for="fileInput">📎 Ảnh / Video</label>
+          <input id="fileInput" type="file" accept="image/*,video/*">
+          <button class="tool" id="emojiBtn">😊 Emoji</button>
+          <span id="fileName"></span>
+        </div>
+        <div class="compose-row">
+          <textarea id="messageInput" placeholder="Nhập tin nhắn của bạn..." rows="1"></textarea>
+          <button class="send" id="sendBtn">Gửi ➤</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="footer">Cộng Đồng Chat · Phiên bản GitHub Pages</div>
 </div>
-<img id="preview" alt="Xem trước">
-<button id="sendFile">Gửi ảnh/video</button>
-</section>
-</main>
+
 <script>
-const $=id=>document.getElementById(id);
-let name=localStorage.getItem("chat_name")||"";
-let file=null;
-$("nickname").value=name;
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = "congdongchat_messages_v1";
+const NAME_KEY = "congdongchat_name_v1";
 
-$("save").onclick=()=>{
- name=$("nickname").value.trim();
- if(!name)return alert("Bạn hãy nhập tên!");
- localStorage.setItem("chat_name",name);
- alert("Đã lưu tên!");
-};
-
-function addMessage(author,text,media,type){
- const box=document.createElement("div");
- box.className="msg"+(author===name?" mine":"");
- const n=document.createElement("div");
- n.className="name";n.textContent=author;
- box.appendChild(n);
- if(text){
-  const t=document.createElement("div");
-  t.textContent=text;t.style.whiteSpace="pre-wrap";
-  box.appendChild(t);
- }
- if(media){
-  if(type==="video"){
-   const v=document.createElement("video");
-   v.src=media;v.controls=true;box.appendChild(v);
-  }else{
-   const img=document.createElement("img");
-   img.src=media;img.alt="Ảnh chia sẻ";box.appendChild(img);
-  }
- }
- const tm=document.createElement("div");
- tm.className="time";
- tm.textContent=new Date().toLocaleString("vi-VN");
- box.appendChild(tm);
- $("messages").appendChild(box);
- $("messages").scrollTop=$("messages").scrollHeight;
+let nickname = localStorage.getItem(NAME_KEY);
+if (!nickname) {
+  nickname = prompt("Bạn muốn dùng biệt danh gì?") || "Thành viên";
+  nickname = nickname.trim().slice(0,30) || "Thành viên";
+  localStorage.setItem(NAME_KEY, nickname);
 }
 
-$("send").onclick=()=>{
- if(!name)return alert("Hãy nhập tên và bấm Lưu tên!");
- const text=$("message").value.trim();
- if(!text)return;
- addMessage(name,text);
- $("message").value="";
-};
+let selectedFile = null;
+let messages = [];
 
-$("message").addEventListener("keydown",e=>{
- if(e.key==="Enter"&&!e.shiftKey){
-  e.preventDefault();$("send").click();
- }
+try {
+  messages = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  if (!Array.isArray(messages)) messages = [];
+} catch {
+  messages = [];
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[char]);
+}
+
+function saveMessages() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  } catch {
+    alert("Bộ nhớ trình duyệt đã đầy. Hãy xóa bớt lịch sử hoặc gửi tệp nhỏ hơn.");
+  }
+}
+
+function renderMessages() {
+  const container = $("messages");
+  container.replaceChildren();
+
+  if (!messages.length) {
+    const welcome = document.createElement("div");
+    welcome.className = "welcome";
+    welcome.innerHTML = "👋<br><b>Chào mừng đến với Cộng Đồng Chat!</b><br>Hãy gửi tin nhắn đầu tiên để bắt đầu.";
+    container.appendChild(welcome);
+    return;
+  }
+
+  messages.forEach(msg => {
+    const item = document.createElement("div");
+    item.className = "message" + (msg.owner === nickname ? " mine" : "");
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = (msg.name || "?").trim().charAt(0).toUpperCase();
+
+    const wrap = document.createElement("div");
+    wrap.className = "bubble-wrap";
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = msg.name || "Thành viên";
+
+    const time = document.createElement("span");
+    time.className = "time";
+    time.textContent = msg.time || "";
+
+    meta.append(name, time);
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = msg.text || "";
+
+    if (msg.fileData && msg.fileType) {
+      let media;
+      if (msg.fileType.startsWith("image/")) {
+        media = document.createElement("img");
+        media.alt = msg.fileName || "Ảnh đính kèm";
+      } else if (msg.fileType.startsWith("video/")) {
+        media = document.createElement("video");
+        media.controls = true;
+        media.playsInline = true;
+      }
+      if (media) {
+        media.src = msg.fileData;
+        bubble.appendChild(media);
+      }
+    }
+
+    wrap.append(meta, bubble);
+    item.append(avatar, wrap);
+    container.appendChild(item);
+  });
+
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage() {
+  const text = $("messageInput").value.trim();
+
+  if (!text && !selectedFile) {
+    $("messageInput").focus();
+    return;
+  }
+
+  const addMessage = fileData => {
+    messages.push({
+      id: Date.now() + Math.random(),
+      name: nickname,
+      owner: nickname,
+      text,
+      time: new Date().toLocaleTimeString("vi-VN", {
+        hour: "2-digit", minute: "2-digit"
+      }),
+      fileData: fileData || "",
+      fileType: selectedFile ? selectedFile.type : "",
+      fileName: selectedFile ? selectedFile.name : ""
+    });
+
+    // Giữ lịch sử trong giới hạn để giảm nguy cơ đầy bộ nhớ.
+    if (messages.length > 100) messages = messages.slice(-100);
+
+    saveMessages();
+    renderMessages();
+    $("messageInput").value = "";
+    $("messageInput").style.height = "auto";
+    selectedFile = null;
+    $("fileInput").value = "";
+    $("fileName").textContent = "";
+  };
+
+  if (selectedFile) {
+    const reader = new FileReader();
+    reader.onload = () => addMessage(reader.result);
+    reader.onerror = () => alert("Không đọc được tệp. Hãy thử chọn lại.");
+    reader.readAsDataURL(selectedFile);
+  } else {
+    addMessage("");
+  }
+}
+
+$("sendBtn").addEventListener("click", sendMessage);
+
+$("messageInput").addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
 });
 
-$("file").onchange=()=>{
- file=$("file").files[0]||null;
- $("preview").style.display="none";
- if(!file)return;
- if(!/^(image|video)\//.test(file.type)){
-  alert("Chỉ chọn ảnh hoặc video!");
-  file=null;return;
- }
- if(file.size>20*1024*1024){
-  alert("Tệp tối đa 20 MB!");
-  file=null;return;
- }
- if(file.type.startsWith("image/")){
-  $("preview").src=URL.createObjectURL(file);
-  $("preview").style.display="block";
- }
-};
+$("messageInput").addEventListener("input", () => {
+  $("messageInput").style.height = "auto";
+  $("messageInput").style.height =
+    Math.min($("messageInput").scrollHeight, 150) + "px";
+});
 
-$("sendFile").onclick=()=>{
- if(!name)return alert("Hãy lưu tên trước!");
- if(!file)return alert("Bạn chưa chọn ảnh/video!");
- const url=URL.createObjectURL(file);
- addMessage(name,"",url,file.type.startsWith("video/")?"video":"image");
- file=null;
- $("file").value="";
- $("preview").style.display="none";
-};
+$("fileInput").addEventListener("change", event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/") &&
+      !file.type.startsWith("video/")) {
+    alert("Vui lòng chọn ảnh hoặc video.");
+    event.target.value = "";
+    return;
+  }
+
+  const limit = file.type.startsWith("image/") ? 2 * 1024 * 1024 : 4 * 1024 * 1024;
+
+  if (file.size > limit) {
+    alert("Tệp quá lớn. Bản này giới hạn ảnh 2 MB và video 4 MB.");
+    event.target.value = "";
+    return;
+  }
+
+  selectedFile = file;
+  $("fileName").textContent = "Đã chọn: " + file.name;
+});
+
+$("emojiBtn").addEventListener("click", () => {
+  const emojis = ["😀","😂","😍","🥰","👍","❤️","🔥","🎉","😎","😭","🤔","🙏"];
+  const choice = prompt("Chọn emoji bằng cách nhập số:\n" +
+    emojis.map((emoji, i) => `${i + 1}. ${emoji}`).join("   "));
+  const index = Number(choice) - 1;
+  if (Number.isInteger(index) && index >= 0 && index < emojis.length) {
+    $("messageInput").value += emojis[index];
+    $("messageInput").focus();
+  }
+});
+
+$("changeName").addEventListener("click", () => {
+  const next = prompt("Nhập biệt danh mới:", nickname);
+  if (next && next.trim()) {
+    nickname = next.trim().slice(0,30);
+    localStorage.setItem(NAME_KEY, nickname);
+    renderMessages();
+  }
+});
+
+$("clearBtn").addEventListener("click", () => {
+  if (!confirm("Bạn có chắc muốn xóa toàn bộ lịch sử chat trên trình duyệt này?")) return;
+  messages = [];
+  saveMessages();
+  renderMessages();
+});
+
+renderMessages();
 </script>
 </body>
 </html>
